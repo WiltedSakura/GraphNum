@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div style="text-align:center; margin-bottom: 100px;margin-top: 50px;font-size: 30px;"><b>Ventes 2022</b></div>
+    <div id="graphContainer" style="margin:auto; border: 2px solid black;"></div>
+    <script defer>
+
+        let mois = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+        let ventes = [6500, 5550, 4200, 4525, 2500, 1500, 500, 1000, 1750, 2300, 3700, 3500];
+
+        const svgns = "http://www.w3.org/2000/svg";
+        let viewPortMaxUnitX = 1200;
+        let viewPortMaxUnitY = 1200;
+        let viewport = null;
+        init_UI();
+        function init_UI() {
+            insertViewPort("graphContainer");
+            let maxGraph = Math.round(Math.max(...ventes));
+
+            Graph(maxGraph + 500, 100, 50, 5);
+        }
+        function insertViewPort(containerId) {
+            viewport = document.createElementNS(svgns, "svg");
+            viewport.setAttribute("id", "viewport");
+            viewport.setAttribute("viewBox", "0 -15 " + viewPortMaxUnitX + " " + viewPortMaxUnitY);
+            document.getElementById(containerId).appendChild(viewport);
+        }
+        function demoShapes() {
+            viewport.appendChild(line(20, 20, 400, 200, 'green', 15))
+            viewport.appendChild(line(20, 20, 400, 150, 'red', 15))
+            viewport.appendChild(line(20, 20, 400, 100, 'blue', 15))
+            viewport.appendChild(line(20, 20, 400, 50, 'orange', 15))
+            viewport.appendChild(rect(500, 20, 300, 200, 'orange', 'yellow', 15))
+            viewport.appendChild(rect(500, 300, 300, 200, 'magenta', 'cyan', 15))
+            let gray;
+            for (let angle = 360; angle >= 0; angle -= 15) {
+                gray = angle / 360 * 255;
+                viewport.appendChild(text(220, 400, 'Bonjour', angle, 4, `rgb(${gray}, ${gray}, ${gray})`))
+            }
+        }
+
+        /*
+                function Graph(maxGraph, stepValue, smallLineAmount, spacing) {
+        
+                    let nbLignesGros = (maxGraph / (stepValue * smallLineAmount));
+                    //console.log(nbLignesGros);
+                    for (let i = 0; i <= nbLignesGros + 1; i++) {
+                        for (let o = i * spacing; o < nbLignesGros * smallLineAmount; o++) {
+                            viewport.appendChild(line(50, spacing / (smallLineAmount + 1) * o, 700, spacing / (smallLineAmount + 1) * o, 'red', 2));
+                        }
+        
+                        if (i >= nbLignesGros)
+                            viewport.appendChild(text(0, spacing * i, "$ 0 "));
+        
+        
+                        else
+                            viewport.appendChild(text(0, spacing * i, "$" + (maxGraph - (i * stepValue * smallLineAmount)).toString()));
+                        viewport.appendChild(line(50, spacing * i, 700, spacing * i, 'black', 5));
+                    }
+                }
+        */
+
+
+        function Graph(maxGraph, valuePerStep, spacing, nbStep) {
+            let nbLignes = maxGraph / (valuePerStep * nbStep);
+            let bigStep = valuePerStep * nbStep;
+            /*for (let i = 0; i < nbLignes + 1; i++) {
+
+                viewport.appendChild(text(0, spacing * i, "$" + (maxGraph - (i * valuePerStep * nbStep)).toString()));
+                viewport.appendChild(line(50, spacing * i, 700, spacing * i));
+            }
+            */
+
+
+
+            for (let o = 0; o <= nbLignes * nbStep; o++) {
+
+                viewport.appendChild(line(250, spacing / nbStep * o, 800, spacing / nbStep * o, 'grey',))
+
+                if ((((maxGraph - (o * valuePerStep)) % bigStep) == 0)) {
+                    viewport.appendChild(text(200, spacing / nbStep * o, "$" + (maxGraph - (o * valuePerStep)).toString()));
+                    viewport.appendChild(line(250, spacing / nbStep * o, 800, spacing / nbStep * o, 'black', 5))
+                }
+
+
+            }
+
+            //viewport.appendChild(rect(260, spacing / nbStep * (7000 / valuePerStep), 30, 7000 / valuePerStep, 'green', 'black', 1));
+
+
+
+            let nbMois = mois.length;
+
+            for (let e = 0; e < nbMois; e++) {
+                let valVente = ventes[e];
+                viewport.appendChild(text(260 + (45 * e), (spacing / nbStep * (nbLignes * nbStep)) - ((valVente / valuePerStep) * (spacing / nbStep)) - 10, "$" + valVente.toString()));
+                //viewport.appendChild(rect(260 + (45 * e), (spacing / nbStep * (nbLignes * nbStep)) - ((valVente / valuePerStep) * (spacing / nbStep)), 30, (valVente / valuePerStep) * (spacing / nbStep), 'red', 'black', 1));
+                console.log(valVente);
+
+                if (valVente <= 1000)
+                    viewport.appendChild(rect(260 + (45 * e), (spacing / nbStep * (nbLignes * nbStep)) - ((valVente / valuePerStep) * (spacing / nbStep)), 30, (valVente / valuePerStep) * (spacing / nbStep), 'red', 'black', 1));
+
+                else if (valVente > 1000 & valVente <= 2500)
+                    viewport.appendChild(rect(260 + (45 * e), (spacing / nbStep * (nbLignes * nbStep)) - ((valVente / valuePerStep) * (spacing / nbStep)), 30, (valVente / valuePerStep) * (spacing / nbStep), 'orange', 'black', 1));
+
+                else if (valVente > 2500 & valVente <= 4500)
+                    viewport.appendChild(rect(260 + (45 * e), (spacing / nbStep * (nbLignes * nbStep)) - ((valVente / valuePerStep) * (spacing / nbStep)), 30, (valVente / valuePerStep) * (spacing / nbStep), 'yellow', 'black', 1));
+
+                else
+                    viewport.appendChild(rect(260 + (45 * e), (spacing / nbStep * (nbLignes * nbStep)) - ((valVente / valuePerStep) * (spacing / nbStep)), 30, (valVente / valuePerStep) * (spacing / nbStep), 'green', 'black', 1));
+
+
+                viewport.appendChild(text(270 + (45 * e), spacing / nbStep * (nbLignes * nbStep) + 20, mois[e], 45));
+            }
+        }
+
+
+
+        function line(x1, y1, x2, y2, stroke = "black", strokeWidth = 1) {
+            let line = document.createElementNS(svgns, "line");
+            line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+            line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+            line.setAttribute("stroke", stroke);
+            line.setAttribute("stroke-width", strokeWidth);
+            return line;
+        }
+
+        function rect(x, y, width, height, fill = "white", stroke = "black", strokeWidth = 1) {
+            let rect = document.createElementNS(svgns, "rect");
+            rect.setAttribute("x", x); rect.setAttribute("y", y);
+            rect.setAttribute("width", width); rect.setAttribute("height", height);
+            rect.setAttribute("fill", fill); rect.setAttribute("stroke", stroke);
+            rect.setAttribute("stroke-width", strokeWidth);
+            return rect;
+        }
+
+        function text(x, y, content, angle = 0, size = "1", fill = "black") {
+            let text = document.createElementNS(svgns, "text");
+            text.setAttribute("x", x); text.setAttribute("y", y);
+            text.setAttribute("transform", `rotate(${angle},${x},${y})`);
+            text.setAttribute("font-size", size + "em");
+            text.setAttribute("fill", fill);
+            text.innerHTML = content;
+            return text;
+        }
+
+    </script>
+
+
+
+</body>
+
+</html>
